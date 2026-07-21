@@ -5,59 +5,68 @@
 ![DevSecOps](https://img.shields.io/badge/DevSecOps-Ready-brightgreen?style=for-the-badge)
 ![FinOps](https://img.shields.io/badge/FinOps-Cost_Optimized-blue?style=for-the-badge)
 
-An event-driven automated governance system built on AWS. This project enforces tagging compliance, automatically cleans up orphaned/expired infrastructure to optimize cloud spend, and instantly remediates security misconfigurations (e.g., unauthorized open ports).
+An event-driven AWS governance project that combines FinOps, DevSecOps, and cloud automation into a practical, testable solution. It helps teams enforce tagging rules, identify expired resources by TTL, and notify stakeholders when non-compliant infrastructure is detected.
 
 ## 📖 Overview
 
-In modern cloud environments, resources are frequently spun up and forgotten, leading to runaway costs ("cloud waste") and expanded attack surfaces. This project acts as an automated governance layer that spans three distinct disciplines:
+Cloud environments often accumulate forgotten or over-provisioned resources, causing unnecessary spend and security drift. This project provides a lightweight governance layer that can:
 
-*   **FinOps:** Automatically terminates resources that have exceeded their Time-To-Live (TTL).
-*   **DevSecOps:** Detects and remediates dangerous security group drifts (like open SSH to `0.0.0.0/0`).
-*   **Cloud Automation:** Enforces strictly tagged environments using event-driven architectures.
-
-## 🏗️ Architecture 
-
-    ┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
-    │ User Action     │  ──>  │ AWS CloudTrail  │  ──>  │ Amazon EventBridge│
-    └─────────────────┘       └─────────────────┘       └─────────────────┘
-                                         │
-             ┌───────────────────────────┼───────────────────────────┐
-             ▼                           ▼                           ▼
-    [ Event: RunInstances ]     [ Event: Daily Cron ]       [ Config: Rule Breach ]
-             │                           │                           │
-    ┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
-    │ Compliance      │         │ FinOps Janitor  │         │ AWS Config &    │
-    │ Lambda (Python) │         │ Lambda (Python) │         │ SSM Automation  │
-    └─────────────────┘         └─────────────────┘         └─────────────────┘
-             │                           │                           │
-    Checks for Tags:            Checks 'TTL' Tag:           Auto-Remediates:
-    Owner, Env, TTL             If Expired ──┐              Removes 0.0.0.0/0
-             │                           │                  from Port 22
-             ▼                           ▼                           │
-    ┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
-    │ Amazon SNS      │         │ Amazon EC2      │         │ Secure State    │
-    └─────────────────┘         └─────────────────┘         └─────────────────┘
-             │
-       Alerts Engineer
+- enforce required tags for EC2 resources
+- identify instances that have exceeded their TTL
+- publish compliance alerts through SNS
+- support deployment through AWS Lambda, CloudFormation, and GitHub Actions
 
 ## ✨ Core Features
 
-1. **Real-Time Compliance Enforcement:** Intercepts `RunInstances` API calls. If an instance lacks mandatory tags (`Owner`, `Environment`, `TTL`), it alerts the responsible team via SNS.
-2. **Automated Cost Optimization:** A scheduled EventBridge cron job triggers a Lambda function daily to assess the `TTL` tag on all instances. Expired instances are automatically terminated.
-3. **Security Drift Remediation:** AWS Config continuously monitors Security Groups. If an engineer accidentally opens port 22 or 3306 to the public, an SSM Automation document instantly reverts the rule to a secure state.
+1. Real-Time Compliance Checks
+   - Evaluates EC2 launch events and flags instances missing required tags such as Owner, Environment, and TTL.
+2. TTL-Based Janitor Logic
+   - Detects expired instances based on the TTL tag and launch time.
+3. AWS-Friendly Automation
+   - Includes Lambda handlers, CloudFormation resources, and CI/CD deployment workflow.
+4. Test Coverage
+   - Includes automated pytest tests for the core compliance and janitor behaviors.
 
-## 🛠️ Technologies Used
-*   **Compute & Automation:** AWS Lambda (Python/Boto3), AWS Systems Manager (SSM)
-*   **Event Routing:** Amazon EventBridge, AWS CloudTrail
-*   **Governance & Security:** AWS Config, IAM
-*   **Notifications:** Amazon SNS
+## 🛠️ Tech Stack
 
-## 🚀 How to Deploy
+- Python 3.13
+- boto3 for AWS SDK integration
+- pytest for automated validation
+- GitHub Actions for CI/CD
+- AWS Lambda and CloudFormation for deployment
 
-1. Enable **AWS CloudTrail** to log Management Events.
-2. Create an **SNS Topic** for compliance alerts and subscribe your email.
-3. Deploy the `compliance_checker.py` and `janitor.py` scripts to **AWS Lambda** with an IAM execution role granting EC2 and SNS permissions.
-4. Configure **EventBridge** rules:
-   * Rule 1 (Event Pattern): Triggers the Compliance Lambda on EC2 `RunInstances`.
-   * Rule 2 (Schedule): Triggers the Janitor Lambda on a daily `cron()` schedule.
-5. Enable **AWS Config** and deploy the `restricted-ssh` managed rule, attaching the `AWS-DisablePublicAccessForSecurityGroup` SSM remediation document.
+## 🚀 Local Setup
+
+```bash
+python -m pip install -r requirements.txt
+python -m pytest -q
+```
+
+## ☁️ Deployment
+
+1. Create the AWS resources with CloudFormation:
+
+```bash
+aws cloudformation deploy \
+  --template-file deploy/aws-resources.yaml \
+  --stack-name cloud-janitor-stack \
+  --capabilities CAPABILITY_IAM
+```
+
+2. Add the following GitHub repository secrets:
+   - AWS_ACCESS_KEY_ID
+   - AWS_SECRET_ACCESS_KEY
+
+3. Push to the main branch to trigger the deployment workflow.
+
+## 📁 Project Structure
+
+- compliance_checker.py — Lambda handler for compliance enforcement
+- janitor.py — TTL-based cleanup logic
+- tests/test_lambda_handlers.py — automated tests
+- deploy/aws-resources.yaml — AWS infrastructure template
+- .github/workflows/deploy.yml — GitHub Actions deployment pipeline
+
+## 🔗 Repository
+
+https://github.com/shatteredcode69/Automated-Cloud-Janitor-Environment-Lifecycle-Engine
