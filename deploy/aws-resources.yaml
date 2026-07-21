@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Basic AWS resources for the cloud janitor project
+Resources:
+  ComplianceFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: cloud-compliance-checker
+      Runtime: python3.13
+      Handler: compliance_checker.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+            return {"statusCode": 200, "body": "placeholder"}
+      Timeout: 60
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref ComplianceTopic
+  JanitorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: cloud-janitor
+      Runtime: python3.13
+      Handler: janitor.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+            return {"statusCode": 200, "body": "placeholder"}
+      Timeout: 60
+  ComplianceTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: cloud-janitor-compliance
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: lambda-basic
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - ec2:DescribeInstances
+                  - ec2:TerminateInstances
+                  - sns:Publish
+                Resource: '*'
+Outputs:
+  ComplianceTopicArn:
+    Value: !Ref ComplianceTopic
