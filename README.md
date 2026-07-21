@@ -16,6 +16,36 @@ Cloud environments often accumulate forgotten or over-provisioned resources, cau
 - publish compliance alerts through SNS
 - support deployment through AWS Lambda, CloudFormation, and GitHub Actions
 
+## 🧠 Architecture Overview
+
+```mermaid
+flowchart LR
+    A[User launches EC2 instance] --> B[CloudTrail captures event]
+    B --> C[EventBridge rule]
+    C --> D[Compliance Lambda]
+    D --> E[SNS alert]
+
+    F[Daily scheduled trigger] --> G[Janitor Lambda]
+    G --> H[TTL evaluation]
+    H --> I[Terminate expired instances]
+```
+
+## 🔄 Workflow
+
+```mermaid
+sequenceDiagram
+    participant U as Engineer
+    participant C as CloudTrail
+    participant E as EventBridge
+    participant L as Lambda
+    participant S as SNS
+
+    U->>C: Launch EC2 instance
+    C->>E: Emit management event
+    E->>L: Trigger compliance handler
+    L->>S: Publish alert if tags are missing
+```
+
 ## ✨ Core Features
 
 1. Real-Time Compliance Checks
@@ -61,11 +91,28 @@ aws cloudformation deploy \
 
 ## 📁 Project Structure
 
-- compliance_checker.py — Lambda handler for compliance enforcement
-- janitor.py — TTL-based cleanup logic
-- tests/test_lambda_handlers.py — automated tests
-- deploy/aws-resources.yaml — AWS infrastructure template
-- .github/workflows/deploy.yml — GitHub Actions deployment pipeline
+```text
+Automated-Cloud-Janitor-Environment-Lifecycle-Engine/
+├── compliance_checker.py
+├── janitor.py
+├── tests/
+│   └── test_lambda_handlers.py
+├── deploy/
+│   └── aws-resources.yaml
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
+├── requirements.txt
+└── README.md
+```
+
+## 🧪 Validation
+
+The project includes automated tests for the key behaviors:
+
+```bash
+python -m pytest -q
+```
 
 ## 🔗 Repository
 

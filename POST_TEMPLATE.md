@@ -8,8 +8,8 @@ What it does:
 - Publishes compliance alerts through SNS
 - Includes a deployment pipeline with GitHub Actions and AWS CloudFormation
 
-This project was built with Python, boto3, pytest, and AWS services to make governance more automated and easier to scale.
+This project was built with Python, boto3, pytest, and AWS services to make governance more automated, more secure, and easier to scale.
 
 GitHub: https://github.com/shatteredcode69/Automated-Cloud-Janitor-Environment-Lifecycle-Engine
 
-I’d love to hear feedback from anyone working in cloud engineering, security, or DevOps.
+I’d love to hear feedback from anyone working in cloud engineering, security, or DevOps. If you’re building similar automation in AWS, I’d be happy to compare approaches.
