@@ -92,6 +92,39 @@ sequenceDiagram
 4. Test Coverage
    - Includes automated pytest tests for the core compliance and janitor behaviors.
 
+## 🎬 Demo Showcase
+
+```text
+[EC2 Launch Event] --> [Compliance Lambda] --> [SNS Alert]
+        |                                 |
+        v                                 v
+ [TTL Janitor] ------------------------> [Termination Action]
+```
+
+This ASCII flow mirrors the core idea of the project: detect, evaluate, and act automatically.
+
+## 🗺️ Roadmap
+
+- [x] Core Lambda-based compliance checker
+- [x] TTL-based janitor logic
+- [x] GitHub Actions deployment workflow
+- [ ] AWS Config remediation integration
+- [ ] EventBridge rule automation templates
+- [ ] Dashboard-style monitoring and reporting
+
+## 🧰 Tech Stack
+
+<div align="center">
+
+| Layer | Tools |
+|---|---|
+| Automation | ⚙️ Python, boto3, Lambda |
+| Cloud | ☁️ AWS EC2, SNS, EventBridge |
+| Delivery | 🚀 GitHub Actions, CloudFormation |
+| Quality | ✅ pytest |
+
+</div>
+
 ## 🚀 Quick Start
 
 ```bash
@@ -100,14 +133,6 @@ python -m pytest -q
 ```
 
 ## ☁️ Deployment
-
-## 🛠️ Tech Stack
-
-- Python 3.13
-- boto3 for AWS SDK integration
-- pytest for automated validation
-- GitHub Actions for CI/CD
-- AWS Lambda and CloudFormation for deployment
 
 ## ☁️ Deployment
 
