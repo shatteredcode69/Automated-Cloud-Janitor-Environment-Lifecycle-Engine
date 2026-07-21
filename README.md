@@ -1,11 +1,26 @@
 # 🧹 Automated Cloud Janitor & Environment Lifecycle Engine
 
+<div align="center">
+
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![DevSecOps](https://img.shields.io/badge/DevSecOps-Ready-brightgreen?style=for-the-badge)
 ![FinOps](https://img.shields.io/badge/FinOps-Cost_Optimized-blue?style=for-the-badge)
+![Build](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge)
+![Deploy](https://img.shields.io/badge/AWS%20deployment-ready-success?style=for-the-badge)
+
+</div>
 
 An event-driven AWS governance project that combines FinOps, DevSecOps, and cloud automation into a practical, testable solution. It helps teams enforce tagging rules, identify expired resources by TTL, and notify stakeholders when non-compliant infrastructure is detected.
+
+> Built to reduce cloud waste, tighten security posture, and bring governance closer to developers through automation.
+
+## 🧭 Why this project matters
+
+- Reduce unnecessary AWS spend by automatically cleaning up expired resources
+- Improve compliance through mandatory tagging enforcement
+- Strengthen cloud security by surfacing drift and misconfigurations quickly
+- Provide a reusable foundation for event-driven automation in real-world environments
 
 ## 📖 Overview
 
@@ -20,14 +35,34 @@ Cloud environments often accumulate forgotten or over-provisioned resources, cau
 
 ```mermaid
 flowchart LR
-    A[User launches EC2 instance] --> B[CloudTrail captures event]
+    A[Engineer launches EC2] --> B[CloudTrail event]
     B --> C[EventBridge rule]
     C --> D[Compliance Lambda]
     D --> E[SNS alert]
 
-    F[Daily scheduled trigger] --> G[Janitor Lambda]
+    F[Scheduled cron trigger] --> G[Janitor Lambda]
     G --> H[TTL evaluation]
     H --> I[Terminate expired instances]
+```
+
+### Screenshot-style system view
+
+```text
+┌──────────────────────┐        ┌──────────────────────┐
+│   EC2 Instance Launch │ ─────> │   AWS CloudTrail      │
+└──────────────────────┘        └──────────────────────┘
+                                           │
+                                           ▼
+                                ┌──────────────────────┐
+                                │   Amazon EventBridge │
+                                └──────────────────────┘
+                                           │
+                     ┌─────────────────────────┼─────────────────────────┐
+                     ▼                         ▼                         ▼
+          ┌───────────────────┐      ┌───────────────────┐      ┌───────────────────┐
+          │ Compliance Lambda │      │ Janitor Lambda    │      │ SNS Notifications  │
+          │   Tag validation  │      │ TTL cleanup       │      │ Alerts & routing  │
+          └───────────────────┘      └───────────────────┘      └───────────────────┘
 ```
 
 ## 🔄 Workflow
@@ -57,6 +92,15 @@ sequenceDiagram
 4. Test Coverage
    - Includes automated pytest tests for the core compliance and janitor behaviors.
 
+## 🚀 Quick Start
+
+```bash
+python -m pip install -r requirements.txt
+python -m pytest -q
+```
+
+## ☁️ Deployment
+
 ## 🛠️ Tech Stack
 
 - Python 3.13
@@ -64,13 +108,6 @@ sequenceDiagram
 - pytest for automated validation
 - GitHub Actions for CI/CD
 - AWS Lambda and CloudFormation for deployment
-
-## 🚀 Local Setup
-
-```bash
-python -m pip install -r requirements.txt
-python -m pytest -q
-```
 
 ## ☁️ Deployment
 
@@ -117,3 +154,7 @@ python -m pytest -q
 ## 🔗 Repository
 
 https://github.com/shatteredcode69/Automated-Cloud-Janitor-Environment-Lifecycle-Engine
+
+---
+
+Built with a focus on automation, cloud governance, and practical DevSecOps workflows.
